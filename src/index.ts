@@ -31,7 +31,7 @@ const server = new McpServer({
 });
 
 // Get Chuck Norris joke tool
-const getChuckJoke = server.tool(
+server.tool(
   "get-chuck-joke",
   "Get a random Chuck Norris joke",
   async () => {
@@ -49,7 +49,7 @@ const getChuckJoke = server.tool(
 );
 
 // Get Chuck Norris joke categories tool
-const getChuckCategories = server.tool(
+server.tool(
   "get-chuck-categories",
   "Get all available categories for Chuck Norris jokes",
   async () => {
@@ -67,7 +67,7 @@ const getChuckCategories = server.tool(
 );
 
 // Get Dad joke tool
-const getDadJoke = server.tool(
+server.tool(
   "get-dad-joke",
   "Get a random dad joke",
   async () => {
@@ -89,7 +89,7 @@ const getDadJoke = server.tool(
 );
 
 // Get Yo Mama joke tool
-const getYoMamaJoke = server.tool(
+server.tool(
   "get-yo-mama-joke",
   "Get a random Yo Mama joke",
   async () => {
@@ -113,6 +113,20 @@ const app = express();
 // to support multiple simultaneous connections we have a lookup object from
 // sessionId to transport
 const transports: { [sessionId: string]: SSEServerTransport } = {};
+
+app.post("/sse", async (req: Request, res: Response) => {
+  // Get the full URI from the request
+  const host = req.get("host");
+
+  const fullUri = `https://${host}/jokes`;
+  const transport = new SSEServerTransport(fullUri, res);
+
+  transports[transport.sessionId] = transport;
+  res.on("close", () => {
+    delete transports[transport.sessionId];
+  });
+  await server.connect(transport);
+});
 
 app.get("/sse", async (req: Request, res: Response) => {
   // Get the full URI from the request
