@@ -7,11 +7,9 @@ const app = express();
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   
-  // Log when the request comes in
-  console.log(`➡️ ${req.method} ${req.path}`);
+  console.log(`➡️ ${req.method} ${req.path} - ${new Date(start).toLocaleString("en-US", {})}`);
   
   res.on('finish', () => {
-    // Log when the response is sent
     const duration = Date.now() - start;
     console.log(`⬅️ ${req.method} ${req.path} ${res.statusCode} - ${duration}ms`);
   });
@@ -19,7 +17,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// to support multiple simultaneous connections we have a lookup object from
+// to support multiple simultaneous connections, we have a lookup object from
 // sessionId to transport
 const transports: { [sessionId: string]: SSEServerTransport } = {};
 
@@ -62,7 +60,7 @@ app.post("/jokes", async (req: Request, res: Response) => {
 });
 
 app.get("/", (_req, res) => {
-  res.send("The Jokes MCP server is running!");
+  res.send("✅ The MCP server is running!");
 });
 
 const PORT = process.env.PORT || 3001;
