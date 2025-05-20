@@ -1,23 +1,24 @@
 import { Express, Request, Response } from "express";
 import server from "../mcp/mcp_server.js";
 import { getFullUri } from "../util.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-
 import { connectorPath } from "./routing.js";
+import { CustomSseServerTransport } from "../transport/customSseTransport.js";
 
 const messagePath = '/message';
+const transports: { [sessionId: string]: CustomSseServerTransport } = {};
 
-// to support multiple simultaneous connections, we have a lookup object from sessionId to transport
-const transports: { [sessionId: string]: SSEServerTransport } = {};
+const constructTransport = (req: Request, res: Response) => {
+  const fullUri = getFullUri(req, messagePath);
+  const useAbsoluteUri = process.env.USE_ABSOLUTE_URI === "true";
+  return new CustomSseServerTransport(fullUri, res, useAbsoluteUri);
+}
 
 export const setupSseRouting = (app: Express) => {
   const sseHandler = async (req: Request, res: Response) => {
-    const fullUri = getFullUri(req, messagePath);
-    const transport = new SSEServerTransport(fullUri, res);
-
+    const transport = constructTransport(req, res);
     transports[transport.sessionId] = transport;
     res.on("close", () => {
-      console.log('close sessionId', transport.sessionId);
+      console.log('🔚 close sessionId', transport.sessionId);
       delete transports[transport.sessionId];
     });
     await server.connect(transport);

@@ -8,7 +8,7 @@ const tools = toolSet.tools
 
 const server = new Server(
   {
-    name: "example-servers/everything",
+    name: "server/demo",
     version: "1.0.0",
   },
   {

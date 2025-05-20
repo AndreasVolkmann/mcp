@@ -6,7 +6,7 @@ export const setupServerCommon = (mcpServer: Server) => {
   }
 
   mcpServer.onclose = () => {
-    console.log("🔚 Server closed");
+    // console.log("🔚 Server closed");
   }
 
   mcpServer.onerror = (error: Error) => {
