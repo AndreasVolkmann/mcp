@@ -19,7 +19,12 @@ const server = new McpServer({
       },
     }
   ],
-}, {});
+}, {
+  capabilities: {
+    logging: {},
+    tools: {},
+  }
+});
 
 server.tool(
   "get-chuck-joke",
@@ -46,7 +51,7 @@ server.tool(
     const duration = 20; // seconds
     const steps = 4; // number of steps
     const stepDuration = duration / steps;
-    
+
     for (let i = 1; i < steps + 1; i++) {
       console.log(x.sessionId, x.signal)
       await new Promise((resolve) =>
@@ -54,20 +59,24 @@ server.tool(
       );
 
       console.log("Sending progress notification", i, steps);
-      await server.server.notification({
-        method: "notifications/message",
-        params: {
-          progress: i,
-          total: steps,
-          data: {
-            type: 'activity',
-            content: {
-              type: "message",
-              text: `Processing step ${i} of ${steps}`,
-            }
+      try {
+        await server.server.notification({
+          method: "notifications/message",
+          params: {
+            progress: i,
+            total: steps,
+            data: {
+              type: 'activity',
+              content: {
+                type: "message",
+                text: `Processing step ${i} of ${steps}`,
+              }
+            },
           },
-        },
-      });
+        });
+      } catch (e) {
+        console.warn("Error sending notification:", e);
+      }
     }
 
     return {
@@ -81,5 +90,18 @@ server.tool(
   }
 )
 
+server.server.oninitialized = () => {
+  console.log("Server initialized");
+}
+
+server.server.onclose = () => {
+  console.log("Server closed");
+}
+
+server.server.onerror = (error: Error) => {
+  console.error("Server error:", error);
+}
+
+// server.server.
 
 export default server;
