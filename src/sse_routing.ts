@@ -1,9 +1,9 @@
 import { Express, Request, Response } from "express";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import server from "./mcp.js";
+import server from "./mcp/mcp_server.js";
 import { getFullUri } from "./util.js";
 
-const path = '/call';
+const path = '/message';
 
 // to support multiple simultaneous connections, we have a lookup object from sessionId to transport
 const transports: { [sessionId: string]: SSEServerTransport } = {};
@@ -23,7 +23,6 @@ export const setupRouting = (app: Express) => {
 
   app.post("/sse", sseHandler);
   app.get("/sse", sseHandler);
-
   app.post(path, async (req: Request, res: Response) => {
     const sessionId = req.query.sessionId as string;
     const transport = transports[sessionId];

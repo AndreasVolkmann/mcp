@@ -1,6 +1,6 @@
 import express from "express";
 import { requestLogger } from "./util.js";
-import { setupRouting } from "./routing.js";
+import { setupRouting } from "./sse_routing.js";
 
 const app = express();
 app.use(requestLogger);
