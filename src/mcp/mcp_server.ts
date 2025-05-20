@@ -1,7 +1,10 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
-import { capabilities, getJoke, processBatch, ToolName, toolSchema } from "./tools.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { setupServerCommon } from "./common.js";
+import { getToolSet } from "./toolSet.js";
+
+const toolSet = getToolSet()
+const tools = toolSet.tools
 
 const server = new Server(
   {
@@ -9,7 +12,7 @@ const server = new Server(
     version: "1.0.0",
   },
   {
-    capabilities,
+    capabilities: toolSet.capabilities,
   }
 );
 
@@ -17,28 +20,19 @@ setupServerCommon(server)
 
 server.setRequestHandler(ListToolsRequestSchema, async (request, extra) => {
   console.log("🔍 List tools request:", request);
-  const tools: Tool[] = toolSchema
   return { tools }
 })
 
 server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+  console.log("🔧 Call tool request:", request);
   const { name, arguments: args } = request.params;
-
-  if (name === ToolName.ECHO) {
-    return {
-      content: [{ type: "text", text: `Echo: ${args}` }],
-    };
+  const matchingTools = tools.filter(t => t.name === name);
+  if (matchingTools.length === 0) {
+    throw new Error(`Tool ${name} not found`);
   }
 
-  if (name === ToolName.GET_JOKE) {
-    return await getJoke()
-  }
-
-  if (name === ToolName.PROCESS_BATCH) {
-    return await processBatch(server, extra)
-  }
-
-  throw new Error(`Unknown tool: ${name}`);
+  const tool = matchingTools[0]
+  return await tool.callback(server, args || {})
 });
 
 export default server;

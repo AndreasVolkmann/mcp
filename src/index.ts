@@ -9,7 +9,6 @@ app.use(requestLogger);
 const transport = process.env.transport || 'sse'
 
 if (transport === "sse") {
-
   setupSseRouting(app)
 } else if (transport === "http") {
   app.use(express.json());
