@@ -25,7 +25,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
   const { name, arguments: args } = request.params;
 
   if (name === ToolName.ECHO) {
-    // const validatedArgs = EchoSchema.parse(args);
     return {
       content: [{ type: "text", text: `Echo: ${args}` }],
     };

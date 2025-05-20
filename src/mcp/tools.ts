@@ -38,7 +38,6 @@ export const processBatch = async (mcpServer: Server, x: RequestHandlerExtra): P
   const stepDuration = duration / steps;
 
   for (let i = 1; i < steps + 1; i++) {
-    console.log(x.sessionId, x.signal)
     await new Promise((resolve) =>
       setTimeout(resolve, stepDuration * 1000)
     );
