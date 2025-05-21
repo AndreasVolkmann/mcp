@@ -24,7 +24,7 @@ server.setRequestHandler(ListToolsRequestSchema, async (request, extra) => {
 })
 
 server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
-  console.log("🔧 Call tool request:", request);
+  console.log(`🔧 Call tool request: ${request.params.name}(${request.params.arguments})`);
   const { name, arguments: args } = request.params;
   const matchingTools = tools.filter(t => t.name === name);
   if (matchingTools.length === 0) {
