@@ -10,7 +10,9 @@
     "dev": "ts-node-esm src/index.ts"
   },
   "dependencies": {
+    "@arizeai/openinference-instrumentation-mcp": "^0.2.1",
     "@modelcontextprotocol/sdk": "~1.11.4",
+    "@opentelemetry/sdk-trace-node": "^2.0.1",
     "content-type": "^1.0.5",
     "express": "^5.1.0",
     "zod": "^3.25.7"
