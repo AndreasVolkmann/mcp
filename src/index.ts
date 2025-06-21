@@ -1,3 +1,7 @@
+// Initialize instrumentation before importing other modules
+import { setupInstrumentation } from "./instrumentation.js";
+setupInstrumentation();
+
 import express from "express";
 import { requestLogger } from "./util.js";
 import { setupCommonRouting } from "./routing/routing.js";
